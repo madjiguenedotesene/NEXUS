@@ -31,7 +31,7 @@ const campusPacks = [
   { 
     id: 1, 
     name: 'Pack Audit', 
-    price: '20 000', 
+    price: '50 000', 
     currency: 'FCFA',
     icon: <Search size={32} />, 
     desc: 'Correction technique et mise en conformité de votre dossier Campus France existant.',
@@ -45,7 +45,7 @@ const campusPacks = [
   { 
     id: 2, 
     name: 'Pack Sérénité', 
-    price: '50 000', 
+    price: '75 000', 
     currency: 'FCFA',
     icon: <Rocket size={32} />, 
     popular: true, 
@@ -61,7 +61,7 @@ const campusPacks = [
   { 
     id: 3, 
     name: 'Pack Expert+', 
-    price: '75 000', 
+    price: '100 000', 
     currency: 'FCFA',
     icon: <Sparkles size={32} />, 
     desc: 'Accompagnement VIP incluant la recherche de logement et l\'installation en France.',
