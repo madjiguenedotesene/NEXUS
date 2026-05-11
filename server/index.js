@@ -69,4 +69,5 @@ app.post('/api/send-order', upload.any(), async (req, res) => {
   }
 });
 
-app.listen(3001, () => console.log("✅ Serveur NEXUS Mail actif sur http://localhost:3001"));
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log(`✅ Serveur NEXUS actif sur le port ${PORT}`));
