@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Menu, X, Zap, Cpu, Home, Search, GraduationCap } from 'lucide-react'
-
+import logoUrl from '../assets/logo.png';
 /* ──────────────────────────────────────────
    PALETTE APEX GREEN
 ────────────────────────────────────────── */
@@ -74,7 +74,7 @@ const Navbar = () => {
         >
          <Link to="/" style={{ lineHeight: 0, flexShrink: 0, display: 'flex', alignItems: 'center' }}>
   <img 
-    src='../assets/logo.png' 
+    src={logoUrl} 
     alt="Nexus Omni Bot Logo" 
     style={{ height: '40px', width: 'auto', objectFit: 'contain' }} 
   />
