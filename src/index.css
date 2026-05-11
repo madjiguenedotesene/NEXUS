@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  /* Palette Vert Émeraude / Noir (Harmonisée avec ton Home.jsx) */
+  --bg-primary: #050a08; 
+  --bg-secondary: #0a0a0a;
+  --bg-tertiary: #111111;
+  
+  --accent-primary: #064e3b;  /* Vert Foncé */
+  --accent-secondary: #059669; /* Vert Accent (Emerald 600) */
+  --accent-hover: #047857;
+  --accent-glow: rgba(5, 150, 105, 0.15);
+  
+  --text-primary: #ffffff;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  
+  --glass-bg: rgba(5, 10, 8, 0.85);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(5, 150, 105, 0.4);
+  
+  --radius-md: 20px;
+  --radius-lg: 32px;
+  --font-main: 'Inter', sans-serif;
+  --font-heading: 'Outfit', sans-serif;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* RESET & BASE */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* CLASSES UTILITAIRES POUR TES FUTURES PAGES */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+}
+
+.card-premium {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 2rem;
+  transition: var(--transition);
+}
+
+.card-premium:hover {
+  border-color: var(--accent-secondary);
+  transform: translateY(-5px);
+}
+
+.btn-primary {
+  background: var(--accent-secondary);
+  color: #000; /* Texte noir sur fond vert pour lisibilité */
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition);
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+  transform: scale(1.02);
+}
+
+/* Grille de fond subtile (comme dans ton Home) */
+.grid-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.03) 1px, transparent 0);
+  background-size: 32px 32px;
+}
