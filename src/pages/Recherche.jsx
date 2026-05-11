@@ -51,8 +51,11 @@ export default function Recherche() {
     try {
       // Appel à l'API Flask (backend) sur le port 5001
       // On passe la requête (q) et le numéro de page (p)
-      const response = await fetch(`http://localhost:5001/api/v1/elanpro/jobs?q=${encodeURIComponent(query)}&p=${page}`);
-      const result = await response.json();
+      // On utilise la variable d'environnement définie dans Render ou dans ton .env
+const API_BASE_URL = import.meta.env.VITE_API_PYTHON_URL || "http://localhost:5001";
+
+const response = await fetch(`${API_BASE_URL}/api/v1/elanpro/jobs?q=${encodeURIComponent(query)}&p=${page}`);
+const result = await response.json();
       
       // Mise à jour des états avec les données reçues
       setJobs(result.data || []);       // Offres pour la page actuelle
