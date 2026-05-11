@@ -1,5 +1,6 @@
 import React from 'react'
 import { motion } from 'framer-motion'
+import cv from '../assets/cv.png';
 import { 
   ShieldCheck, 
   Cpu, 
@@ -153,7 +154,7 @@ export default function About() {
              <div style={{ position: 'relative' }}>
                 <div style={{ position: 'absolute', inset: '-10px', background: GREEN_ACCENT, borderRadius: '40px', opacity: 0.2, filter: 'blur(20px)' }} />
                 <img 
-                  src="/src/assets/cv.png" 
+                  src={cv} 
                   alt="Madji SENE - Nexus" 
                   style={{ width: '100%', borderRadius: '32px', border: `2px solid ${GREEN_ACCENT}60`, position: 'relative' }} 
                 />
