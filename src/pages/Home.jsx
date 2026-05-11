@@ -217,7 +217,7 @@ export default function Home() {
         >
           <div style={{ position: 'absolute', width: '100%', height: '100%', background: `radial-gradient(circle, ${GREEN_ACCENT}20, transparent)`, borderRadius: '50%', filter: 'blur(40px)', zIndex: -1 }} />
           <div style={{ position: 'relative', padding: '10px' }}>
-            <img src="../assets/hero.png" alt="Workspace Élan Pro" style={{ width: '100%', maxWidth: '540px', borderRadius: '32px', boxShadow: '0 50px 100px -20px rgba(0,0,0,0.7)', border: `1px solid rgba(255,255,255,0.1)`, zIndex: 2 }} />
+            <img src='../assets/hero.png' alt="Workspace Élan Pro" style={{ width: '100%', maxWidth: '540px', borderRadius: '32px', boxShadow: '0 50px 100px -20px rgba(0,0,0,0.7)', border: `1px solid rgba(255,255,255,0.1)`, zIndex: 2 }} />
             <motion.div
               animate={{ y: [0, -10, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
               style={{ position: 'absolute', bottom: '-20px', left: '-20px', background: 'rgba(17, 17, 17, 0.8)', backdropFilter: 'blur(12px)', padding: '16px 20px', borderRadius: '20px', border: `1px solid rgba(255,255,255,0.1)`, display: 'flex', alignItems: 'center', gap: '12px', zIndex: 3 }}

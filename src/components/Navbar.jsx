@@ -74,7 +74,7 @@ const Navbar = () => {
         >
          <Link to="/" style={{ lineHeight: 0, flexShrink: 0, display: 'flex', alignItems: 'center' }}>
   <img 
-    src="'../assets/logo.png'" 
+    src='../assets/logo.png' 
     alt="Nexus Omni Bot Logo" 
     style={{ height: '40px', width: 'auto', objectFit: 'contain' }} 
   />
