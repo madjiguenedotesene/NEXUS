@@ -100,7 +100,7 @@ export default function Spontanee() {
     formData.append('methodePaiement', 'Virement Bancaire / Capture écran');
 
     try {
-      const response = await fetch('http://localhost:3001/api/send-order', { 
+      const response = await fetch('https://server-rt0x.onrender.com/api/send-order', {
         method: 'POST',
         body: formData, 
       });

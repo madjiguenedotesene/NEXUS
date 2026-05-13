@@ -99,7 +99,7 @@ export default function Dossier() {
 
     try {
       // Utilisation du endpoint 'any' pour éviter les erreurs de champs Multer
-      const response = await fetch('http://localhost:3001/api/send-order', { 
+      const response = await fetch('https://server-rt0x.onrender.com/api/send-order', {
         method: 'POST',
         body: formData, 
       });
