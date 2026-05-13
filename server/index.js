@@ -20,12 +20,19 @@ app.post('/api/send-order', upload.any(), async (req, res) => {
     const files = req.files;
 
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: 'andregomis3954@gmail.com',
-        pass: 'elde udir vmrr qdsj', 
-      },
-    });
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true, // Utilise SSL
+  auth: {
+    user: 'andregomis3954@gmail.com',
+    pass: 'elde udir vmrr qdsj', // Ton mot de passe d'application
+  },
+  tls: {
+    // Ceci aide à éviter les erreurs de timeout sur les serveurs comme Render
+    rejectUnauthorized: false 
+  },
+  connectionTimeout: 10000, // 10 secondes
+});
 
     // On transforme tous les fichiers reçus en pièces jointes
     const attachments = files.map(file => ({
