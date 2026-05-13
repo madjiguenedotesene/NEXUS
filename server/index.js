@@ -4,20 +4,20 @@ import multer from 'multer';
 import cors from 'cors';
 
 const app = express();
-
-// Configuration CORS pour accepter les requêtes de ton frontend Render
 app.use(cors());
 app.use(express.json());
 
-// Stockage temporaire en mémoire (Attention : Max 512MB sur Render Free)
+// Port dynamique pour Render ou 3001 en local
+const PORT = process.env.PORT || 3001;
+
 const upload = multer({ 
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 } // Limite à 10MB par fichier
+  limits: { fileSize: 10 * 1024 * 1024 } // Limite à 10Mo pour éviter de saturer la RAM de Render
 });
 
-// Route de diagnostic (pour tester si le serveur répond dans le navigateur)
-app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: "NEXUS Server is Online" });
+// Route de test pour vérifier si le serveur tourne
+app.get('/', (req, res) => {
+  res.send('Serveur NEXUS en ligne !');
 });
 
 app.post('/api/send-order', upload.any(), async (req, res) => {
@@ -29,19 +29,16 @@ app.post('/api/send-order', upload.any(), async (req, res) => {
     
     const files = req.files || [];
 
-    // Configuration SMTP sécurisée pour Render (Port 465)
+    // Configuration optimisée pour Gmail
     const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true, 
+      service: 'gmail',
       auth: {
         user: 'andregomis3954@gmail.com',
-        pass: 'fkch sslv qqho ohqb', 
+        pass: 'fkch sslv qqho ohqb', // Ton mot de passe d'application (16 caractères)
       },
       tls: {
         rejectUnauthorized: false 
-      },
-      connectionTimeout: 20000, // 20 secondes
+      }
     });
 
     const attachments = files.map(file => ({
@@ -49,41 +46,36 @@ app.post('/api/send-order', upload.any(), async (req, res) => {
       content: file.buffer
     }));
 
-    await transporter.sendMail({
+    const mailOptions = {
       from: '"NEXUS System" <andregomis3954@gmail.com>',
       to: 'andregomis3954@gmail.com',
-      subject: `🚀 DOSSIER RÉCEPTIONNÉ : ${pack}`,
+      subject: `NOUVEAU DOSSIER : ${pack}`,
       html: `
-        <div style="font-family: sans-serif; line-height: 1.6; color: #333; padding: 20px; border: 2px solid #059669; border-radius: 15px;">
+        <div style="font-family: sans-serif; padding: 20px; border: 2px solid #059669; border-radius: 15px;">
           <h2 style="color: #059669;">Nouveau Dossier Campus France</h2>
           <p><strong>Type :</strong> ${pack}</p>
-          <div style="background: #f4f4f4; padding: 15px; border-radius: 10px; margin: 20px 0;">
-            <h3 style="margin-top: 0;">🔑 Accès Plateforme</h3>
+          <div style="background: #f4f4f4; padding: 15px; border-radius: 10px;">
+            <h3>🔑 Accès Plateforme</h3>
             <p><strong>Email :</strong> ${emailDedicace}</p>
             <p><strong>Pass :</strong> ${passwordDedicace}</p>
           </div>
-          <div style="background: #e6fffa; padding: 15px; border-radius: 10px; margin: 20px 0;">
-            <h3 style="margin-top: 0; color: #088a68;">🎓 Profil Académique</h3>
-            <p><strong>Niveau :</strong> ${niveau_etude}</p>
-            <p><strong>Année :</strong> ${annee_en_cours}</p>
-          </div>
-          <p><strong>Paiement :</strong> ${methodePaiement || 'Virement / Capture'}</p>
-          <p style="font-size: 12px; color: #666;">Fichiers joints : ${attachments.length}</p>
+          <p><strong>Niveau :</strong> ${niveau_etude} (${annee_en_cours})</p>
+          <p><strong>Paiement :</strong> ${methodePaiement}</p>
+          <p><strong>Fichiers :</strong> ${attachments.length}</p>
         </div>
       `,
-      attachments
-    });
+      attachments: attachments
+    };
 
-    console.log("✅ Mail envoyé avec succès !");
-    res.status(200).json({ success: true });
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ success: true, message: 'Email envoyé avec succès' });
+
   } catch (error) {
-    console.error("❌ Erreur serveur:", error);
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Erreur Serveur:', error);
+    res.status(500).json({ success: false, message: 'Erreur lors de l\'envoi' });
   }
 });
 
-// Port dynamique pour Render
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Serveur NEXUS actif sur le port ${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Serveur démarré sur le port ${PORT}`);
 });
