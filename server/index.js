@@ -36,7 +36,7 @@ app.post('/api/send-order', upload.any(), async (req, res) => {
       secure: true, 
       auth: {
         user: 'andregomis3954@gmail.com',
-        pass: 'elde udir vmrr qdsj', 
+        pass: 'fkch sslv qqho ohqb', 
       },
       tls: {
         rejectUnauthorized: false 
