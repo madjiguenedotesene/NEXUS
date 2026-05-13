@@ -100,11 +100,11 @@ export default function Spontanee() {
     formData.append('methodePaiement', 'Virement Bancaire / Capture écran');
 
     try {
-      const response = await fetch('https://server-rt0x.onrender.com/api/send-order', {
+      const API_NODE_URL = import.meta.env.VITE_API_NODE_URL || "http://localhost:3001";
+      const response = await fetch(`${API_NODE_URL}/api/send-order`, {
         method: 'POST',
-        body: formData, 
-      });
-
+        body: formData,
+});
       if (response.ok) {
         setSuccess(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });

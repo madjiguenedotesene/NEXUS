@@ -373,21 +373,21 @@ export default function Home() {
       {[
         { 
           name: 'Marc-Antoine D.', 
-          role: 'Data Scientist @ Thales', 
+          role: 'Data Scientist @Thales', 
           text: 'Signature en moins d’un mois. L’intelligence de NEXUS a transformé mon profil technique en une véritable machine à convaincre.', 
           initial: 'M',
           stars: 5 
         },
         { 
           name: 'Awa G.', 
-          role: 'Manager @ KFC', 
+          role: 'Manager @KFC', 
           text: 'Le combiné CV + stratégie d’envoi est redoutable. Je suis passée de l’ombre à une visibilité totale auprès des chasseurs de tête.', 
           initial: 'A',
           stars: 5 
         },
         { 
           name: 'Ousmane L.', 
-          role: 'Data Analyst @ Ubisoft', 
+          role: 'Data Analyst @Ubisoft', 
           text: 'Statistiques affolantes : mon taux de conversion en entretien a littéralement quadruplé. C’est l’investissement le plus rentable de ma carrière.', 
           initial: 'O',
           stars: 5 
