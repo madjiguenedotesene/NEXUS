@@ -1,0 +1,30 @@
+services:
+  # ----------------------------------------------------------------------------
+  # CONFIGURATION DU BACKEND (NODE.JS)
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: nexus-server
+    runtime: node
+    plan: free
+    region: frankfurt # Ou la région que tu utilises
+    buildCommand: npm install
+    startCommand: node server/index.js
+    envVars:
+      - key: NODE_VERSION
+        value: 20.0.0
+      - key: PORT
+        value: 10000
+
+  # ----------------------------------------------------------------------------
+  # CONFIGURATION DU FRONTEND (REACT / STATIC SITE)
+  # ----------------------------------------------------------------------------
+  - type: static
+    name: nexus-frontend
+    runtime: static
+    buildCommand: npm install && npm run build
+    publishPath: ./dist
+    # Cette règle "routes" règle l'erreur 404 au rafraîchissement des pages React
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

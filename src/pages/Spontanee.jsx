@@ -89,35 +89,37 @@ export default function Spontanee() {
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
+/* Remplace ton handleSubmit existant par celui-ci */
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  
+  const formData = new FormData(e.currentTarget);
+  formData.append('pack', selectedPack?.name || "Non défini");
+  formData.append('methodePaiement', 'Virement / Capture écran');
 
-  /* ── GESTION DE LA SOUMISSION ── */
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    
-    const formData = new FormData(e.currentTarget);
-    formData.append('pack', selectedPack?.name || "Non défini");
-    formData.append('methodePaiement', 'Virement Bancaire / Capture écran');
+  try {
+    // ON FORCE L'URL DE RENDER POUR ÉVITER LE LOCALHOST
+    const response = await fetch('https://server-rt0x.onrender.com/api/send-order', {
+      method: 'POST',
+      body: formData,
+    });
 
-    try {
-      const API_NODE_URL = "https://server-rt0x.onrender.com";
-      const response = await fetch(`${API_NODE_URL}/api/send-order`, {
-        method: 'POST',
-        body: formData,
-});
-      if (response.ok) {
-        setSuccess(true);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        alert("Une erreur technique est survenue. Vérifiez la connexion au serveur (Port 3001).");
-      }
-    } catch (error) {
-      console.error("Fetch Error:", error);
-      alert("Erreur réseau : Le serveur NEXUS est-il bien allumé ?");
-    } finally {
-      setLoading(false);
+    const result = await response.json();
+
+    if (response.ok && result.success) {
+      setSuccess(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      alert(`Erreur Serveur (${response.status}) : Le serveur n'a pas pu envoyer l'email.`);
     }
-  };
+  } catch (error) {
+    console.error("Fetch Error:", error);
+    alert("Connexion impossible : Vérifiez que le serveur Render n'est pas en veille (cliquez sur 'Initialiser' à nouveau).");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div style={{ 
