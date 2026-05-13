@@ -100,20 +100,24 @@ export default function Spontanee() {
     formData.append('methodePaiement', 'Virement Bancaire / Capture écran');
 
     try {
-      const API_NODE_URL = "https://server-rt0x.onrender.com";
+      const API_NODE_URL = import.meta.env.VITE_API_NODE_URL || "https://server-rt0x.onrender.com";
+      
       const response = await fetch(`${API_NODE_URL}/api/send-order`, {
         method: 'POST',
         body: formData,
-});
+      });
+
       if (response.ok) {
         setSuccess(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
-        alert("Une erreur technique est survenue. Vérifiez la connexion au serveur (Port 3001).");
+        // Récupère le message d'erreur du serveur s'il existe
+        const errorData = await response.json().catch(() => ({}));
+        alert(`Erreur Serveur : ${errorData.message || "Échec de l'envoi"}. Réessayez dans 30 secondes.`);
       }
     } catch (error) {
       console.error("Fetch Error:", error);
-      alert("Erreur réseau : Le serveur NEXUS est-il bien allumé ?");
+      alert("Le serveur NEXUS met trop de temps à répondre. Il est probablement en train de sortir de veille. Attendez un instant et cliquez à nouveau sur le bouton.");
     } finally {
       setLoading(false);
     }
