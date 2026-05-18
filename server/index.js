@@ -36,8 +36,8 @@ app.post('/api/send-order', upload.any(), async (req, res) => {
 
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
-      port: 587,
-      secure: false, // Port 587 utilise STARTTLS
+      port: 465, // Port SSL pour Gmail
+      secure: true, // Port 465 utilise SSL
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS, 
