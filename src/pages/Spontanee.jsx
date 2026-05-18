@@ -96,14 +96,18 @@ const handleSubmit = async (e) => {
   
   const formData = new FormData(e.currentTarget);
   formData.append('pack', selectedPack?.name || "Non défini");
-  formData.append('methodePaiement', 'Virement Bancaire / Capture écran');
+  // On remet une valeur générique pour le paiement en production
+  formData.append('methodePaiement', 'Virement / Mobile Money');
 
   try {
-    const API_NODE_URL = import.meta.env.VITE_API_NODE_URL || "https://server-rt0x.onrender.com";
+    // 💡 CETTE LIGNE DÉTECTE TOUT :
+    // Si une variable Render existe, elle la prend, sinon elle utilise le serveur local 3001
+    const API_NODE_URL = import.meta.env.VITE_API_NODE_URL || "http://localhost:3001";
     
+    // On utilise la variable dynamique ici :
     const response = await fetch(`${API_NODE_URL}/api/send-order`, {
       method: 'POST',
-      body: formData, // Laisse le navigateur gérer le Content-Type automatiquement (Multipart/form-data)
+      body: formData,
     });
 
     const data = await response.json().catch(() => ({}));
@@ -112,16 +116,16 @@ const handleSubmit = async (e) => {
       setSuccess(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-      alert(`Erreur Serveur : ${data.message || "Échec de traitement du dossier"}.`);
+      // Message d'erreur générique adapté pour le local ET le en ligne
+      alert(`Erreur Serveur : ${data.message || "Échec du traitement du dossier"}.`);
     }
   } catch (error) {
     console.error("Fetch Error:", error);
-    alert("Le serveur de traitement est en cours de réveil (Hébergement gratuit Render). Veuillez patienter 20 secondes et soumettre à nouveau le formulaire.");
+    alert("Le serveur met trop de temps à répondre. S'il est en ligne, il est probablement en train de sortir de veille. Attendez un instant et réessayez.");
   } finally {
     setLoading(false);
   }
 };
-
   return (
     <div style={{ 
       minHeight: '100vh', 

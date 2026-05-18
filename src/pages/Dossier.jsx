@@ -88,38 +88,42 @@ export default function Dossier() {
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
+  
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  
+  const formData = new FormData(e.currentTarget);
+  formData.append('pack', `CAMPUS : ${selectedPack?.name}`);
+  // Nettoyage de la mention "Local Test" pour les futurs vrais clients en ligne
+  formData.append('methodePaiement', 'Virement / Mobile Money');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  try {
+    // 💡 Détecte si le site est en ligne sur Render ou sur votre machine
+    const API_NODE_URL = import.meta.env.VITE_API_NODE_URL || "http://localhost:3001";
     
-    const formData = new FormData(e.currentTarget);
-    formData.append('pack', `CAMPUS : ${selectedPack?.name}`);
-    formData.append('methodePaiement', 'Virement / Mobile Money');
+    // Utilisation de la variable dynamique
+    const response = await fetch(`${API_NODE_URL}/api/send-order`, {
+      method: 'POST',
+      body: formData,
+    });
 
-    try {
-      const API_NODE_URL = import.meta.env.VITE_API_NODE_URL || "https://server-rt0x.onrender.com";
-      
-      const response = await fetch(`${API_NODE_URL}/api/send-order`, {
-        method: 'POST',
-        body: formData,
-      });
+    const data = await response.json().catch(() => ({}));
 
-      if (response.ok) {
-        setSuccess(true);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        // Récupère le message d'erreur du serveur s'il existe
-        const errorData = await response.json().catch(() => ({}));
-        alert(`Erreur Serveur : ${errorData.message || "Échec de l'envoi"}. Réessayez dans 30 secondes.`);
-      }
-    } catch (error) {
-      console.error("Fetch Error:", error);
-      alert("Le serveur NEXUS met trop de temps à répondre. Il est probablement en train de sortir de veille. Attendez un instant et cliquez à nouveau sur le bouton.");
-    } finally {
-      setLoading(false);
+    if (response.ok && data.success) {
+      setSuccess(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      // Message d'erreur polyvalent
+      alert(`Erreur Serveur : ${data.message || "Échec de traitement du dossier"}.`);
     }
-  };
+  } catch (error) {
+    console.error("Fetch Error:", error);
+    alert("Le serveur met trop de temps à répondre. S'il s'agit du premier envoi, il est probablement en train de sortir de veille. Patientez 20 secondes et réessayez.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div style={{ minHeight: '100vh', background: BG_PURE, color: '#fff', fontFamily: 'sans-serif', position: 'relative', overflowX: 'hidden' }}>
