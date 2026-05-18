@@ -90,38 +90,37 @@ export default function Spontanee() {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  /* ── GESTION DE LA SOUMISSION ── */
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  
+  const formData = new FormData(e.currentTarget);
+  formData.append('pack', selectedPack?.name || "Non défini");
+  formData.append('methodePaiement', 'Virement Bancaire / Capture écran');
+
+  try {
+    const API_NODE_URL = import.meta.env.VITE_API_NODE_URL || "https://server-rt0x.onrender.com";
     
-    const formData = new FormData(e.currentTarget);
-    formData.append('pack', selectedPack?.name || "Non défini");
-    formData.append('methodePaiement', 'Virement Bancaire / Capture écran');
+    const response = await fetch(`${API_NODE_URL}/api/send-order`, {
+      method: 'POST',
+      body: formData, // Laisse le navigateur gérer le Content-Type automatiquement (Multipart/form-data)
+    });
 
-    try {
-      const API_NODE_URL = import.meta.env.VITE_API_NODE_URL || "https://server-rt0x.onrender.com";
-      
-      const response = await fetch(`${API_NODE_URL}/api/send-order`, {
-        method: 'POST',
-        body: formData,
-      });
+    const data = await response.json().catch(() => ({}));
 
-      if (response.ok) {
-        setSuccess(true);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        // Récupère le message d'erreur du serveur s'il existe
-        const errorData = await response.json().catch(() => ({}));
-        alert(`Erreur Serveur : ${errorData.message || "Échec de l'envoi"}. Réessayez dans 30 secondes.`);
-      }
-    } catch (error) {
-      console.error("Fetch Error:", error);
-      alert("Le serveur NEXUS met trop de temps à répondre. Il est probablement en train de sortir de veille. Attendez un instant et cliquez à nouveau sur le bouton.");
-    } finally {
-      setLoading(false);
+    if (response.ok && data.success) {
+      setSuccess(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      alert(`Erreur Serveur : ${data.message || "Échec de traitement du dossier"}.`);
     }
-  };
+  } catch (error) {
+    console.error("Fetch Error:", error);
+    alert("Le serveur de traitement est en cours de réveil (Hébergement gratuit Render). Veuillez patienter 20 secondes et soumettre à nouveau le formulaire.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div style={{ 

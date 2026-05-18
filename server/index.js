@@ -11,30 +11,34 @@ app.use(express.json());
 
 const upload = multer({ storage: multer.memoryStorage() });
 
-// Utilisation de .any() pour accepter tous les fichiers (bulletins S1, S2, etc.)
+// À remplacer dans votre fichier serveur (ex: server.js)
 app.post('/api/send-order', upload.any(), async (req, res) => {
   try {
+    // Récupération des VRAIS champs envoyés par le formulaire React
     const { 
-      pack, emailDedicace, passwordDedicace, 
-      niveau_etude, annee_en_cours, methodePaiement 
+      pack, 
+      identifiantFT, 
+      passwordFT, 
+      emailDedicace, 
+      passwordDedicace, 
+      methodePaiement 
     } = req.body;
     
-    const files = req.files;
+    const files = req.files || [];
 
     const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false, // Port 587 utilise STARTTLS
-  auth: {
-    user: process.env.EMAIL_USER, // Utilise des variables d'environnement !
-    pass: process.env.EMAIL_PASS, 
-  },
-  tls: {
-    rejectUnauthorized: false 
-  }
-});
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false, 
+      auth: {
+        user: process.env.EMAIL_USER, 
+        pass: process.env.EMAIL_PASS, 
+      },
+      tls: {
+        rejectUnauthorized: false 
+      }
+    });
 
-    // On transforme tous les fichiers reçus en pièces jointes
     const attachments = files.map(file => ({
       filename: file.originalname,
       content: file.buffer
@@ -46,35 +50,37 @@ app.post('/api/send-order', upload.any(), async (req, res) => {
       subject: `🚀 DOSSIER RÉCEPTIONNÉ : ${pack}`,
       html: `
         <div style="font-family: sans-serif; line-height: 1.6; color: #333; padding: 20px; border: 2px solid #059669; border-radius: 15px;">
-          <h2 style="color: #059669;">Nouveau Dossier Campus France</h2>
-          <p><strong>Type :</strong> ${pack}</p>
+          <h2 style="color: #059669;">Nouveau Dossier Reçu - NEXUS</h2>
+          <p><strong>Offre sélectionnée :</strong> ${pack}</p>
+          <p><strong>Méthode de Paiement indiqué :</strong> ${methodePaiement}</p>
           
           <div style="background: #f4f4f4; padding: 15px; border-radius: 10px; margin: 20px 0;">
-            <h3 style="margin-top: 0;">🔑 Accès Plateforme</h3>
-            <p><strong>Email :</strong> ${emailDedicace}</p>
-            <p><strong>Pass :</strong> ${passwordDedicace}</p>
+            <h3 style="margin-top: 0; color: #0284c7;">🔑 Accès France Travail</h3>
+            <p><strong>Identifiant :</strong> ${identifiantFT || 'Non fourni'}</p>
+            <p><strong>Mot de passe :</strong> ${passwordFT || 'Non fourni'}</p>
           </div>
 
-          <div style="background: #e6fffa; padding: 15px; border-radius: 10px; margin: 20px 0;">
-            <h3 style="margin-top: 0; color: #088a68;">🎓 Profil Académique</h3>
-            <p><strong>Niveau :</strong> ${niveau_etude}</p>
-            <p><strong>Année :</strong> ${annee_en_cours}</p>
+          <div style="background: #f4f4f4; padding: 15px; border-radius: 10px; margin: 20px 0;">
+            <h3 style="margin-top: 0; color: #059669;">📧 Espace Candidat Dédié</h3>
+            <p><strong>Email :</strong> ${emailDedicace || 'Non fourni'}</p>
+            <p><strong>Mot de passe :</strong> ${passwordDedicace || 'Non fourni'}</p>
           </div>
 
-          <p><strong>Paiement :</strong> ${methodePaiement || 'Mobile Money / Virement'}</p>
-          <p style="font-size: 12px; color: #666;">Fichiers joints : ${attachments.length}</p>
+          <p style="font-size: 12px; color: #666;">Fichiers joints reçus : ${attachments.length}</p>
         </div>
       `,
       attachments
     });
 
     console.log("✅ Mail envoyé avec succès !");
-    res.status(200).json({ success: true });
+    return res.status(200).json({ success: true, message: "Dossier transmis !" });
+
   } catch (error) {
-    console.error("❌ Erreur serveur:", error);
-    res.status(500).json({ success: false });
+    console.error("❌ Erreur serveur au moment de l'envoi :", error);
+    // Retourner l'erreur précise au format JSON pour aider le frontend à comprendre
+    return res.status(500).json({ 
+      success: false, 
+      message: error.message || "Erreur lors de la configuration du protocole SMTP / Mail." 
+    });
   }
 });
-
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`✅ Serveur NEXUS actif sur le port ${PORT}`));
