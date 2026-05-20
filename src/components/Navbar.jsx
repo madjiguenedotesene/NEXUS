@@ -19,6 +19,8 @@ const navLinks = [
   { name: 'Candidatures', path: '/Spontanee', icon: <Zap size={15} /> },
   { name: 'Campus France', path: '/Dossier', icon: <GraduationCap size={15} /> },
   { name: 'Recherche', path: '/Recherche', icon: <Search size={15} /> },
+  { name: 'Contact', path: '/contact', icon: <Search size={15} /> },
+  { name: 'À propos', path: '/about', icon: <Search size={15} /> },
 ]
 
 function useIsMobile(breakpoint = 900) {
